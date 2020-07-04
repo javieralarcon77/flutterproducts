@@ -125,12 +125,16 @@ class LoginPage extends StatelessWidget {
           elevation: 0.0,
           color: Colors.deepPurple,
           textColor: Colors.white,
-          onPressed: snapshot.hasData ? (){} : null
+          onPressed: snapshot.hasData ? () => _login(context, bloc) : null
         );
       },
     );
+  }
 
-    
+  _login(BuildContext context, LoginBloc bloc){
+    print("Email ${ bloc.emailValue }");
+    print("Password ${ bloc.passwordValue }");
+    Navigator.pushReplacementNamed(context, 'home');
   }
 
   Widget _crearFondo(BuildContext context){
