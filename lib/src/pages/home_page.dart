@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:formvalidation/src/bloc/provider.dart';
 import 'package:formvalidation/src/models/producto_model.dart';
-import 'package:formvalidation/src/providers/productos_provider.dart';
+import 'package:formvalidation/src/bloc/productos_bloc.dart';
 
 class HomePage extends StatelessWidget {
-  final productoProvider = new ProductosProvider();
+   final productosStream = ProductosBloc();
 
   @override
   Widget build(BuildContext context) {
-    final bloc = Provider.of(context);
+    final bloc = Provider.of(context); 
+    productosStream.cargarProductos();
 
     return Scaffold(
       appBar: AppBar(
@@ -22,8 +23,8 @@ class HomePage extends StatelessWidget {
   Widget _crearListado(){
     
 
-    return FutureBuilder(
-      future: productoProvider.cargarProductos(),
+    return StreamBuilder(
+      stream: productosStream.productosStream,
       builder: (BuildContext context, AsyncSnapshot<List<ProductoModel>> snapshot) {
         if(!snapshot.hasData) return Center( child: CircularProgressIndicator() );
 
@@ -44,7 +45,7 @@ class HomePage extends StatelessWidget {
       ),
       onDismissed: ( direccion ){
         //TODO: Borrar producto
-        productoProvider.borrarProducto(producto.id);
+        productosStream.deleteProducto(producto.id);
       },
       child: ListTile(
         title: Text( '${ producto.titulo } - ${ producto.valor }' ),

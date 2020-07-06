@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:formvalidation/src/models/producto_model.dart';
-import 'package:formvalidation/src/providers/productos_provider.dart';
+import 'package:formvalidation/src/bloc/productos_bloc.dart';
 import 'package:formvalidation/src/utils/utils.dart' as utils;
 
 class ProductoPage extends StatefulWidget {
@@ -11,9 +11,11 @@ class ProductoPage extends StatefulWidget {
 
 class _ProductoPageState extends State<ProductoPage> {
   final formKey = GlobalKey<FormState>();
-  final productoProvider = new ProductosProvider();
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+  final productosStream = ProductosBloc();
 
   ProductoModel producto = new ProductoModel();
+  bool _guardando = false;
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +26,7 @@ class _ProductoPageState extends State<ProductoPage> {
     }
 
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
         title: Text("Producto"),
         actions: <Widget>[
@@ -115,7 +118,7 @@ class _ProductoPageState extends State<ProductoPage> {
       textColor: Colors.white,
       label: Text('Guardar'),
       icon: Icon( Icons.save ) ,
-      onPressed: _submit
+      onPressed: (_guardando) ? null : _submit
     );
   }
 
@@ -123,12 +126,24 @@ class _ProductoPageState extends State<ProductoPage> {
     if(!formKey.currentState.validate()) return;
 
     formKey.currentState.save(); //dispara los save de los textfrom field
-
-    print('todo ok');
+    
+    setState(() { _guardando = true; });
+    
     if(producto.id == null){
-      productoProvider.crearProducto(producto);
+      productosStream.crearProducto(producto);
     }else{
-      productoProvider.editarProducto(producto);
+      productosStream.editarProducto(producto);
     }
+
+    mostarSnackBar('Registro guardado');
+    Navigator.pop( context );
+  }
+
+  void mostarSnackBar(String mensaje){
+    final snackBar = SnackBar(
+      content: Text(mensaje),
+      duration: Duration(milliseconds: 1500)
+    );
+    scaffoldKey.currentState.showSnackBar(snackBar);
   }
 }
