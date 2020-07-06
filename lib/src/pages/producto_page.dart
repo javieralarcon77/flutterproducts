@@ -127,13 +127,17 @@ class _ProductoPageState extends State<ProductoPage> {
     );
   }
 
-  void _submit(){    
+  void _submit() async {    
     if(!formKey.currentState.validate()) return;
 
     formKey.currentState.save(); //dispara los save de los textfrom field
     
     setState(() { _guardando = true; });
     
+    if(foto != null){
+      producto.fotoUrl = await productosStream.productoProvider.subirImagen(foto);
+    }
+
     if(producto.id == null){
       productosStream.crearProducto(producto);
     }else{
@@ -182,7 +186,7 @@ class _ProductoPageState extends State<ProductoPage> {
 
     if(pickedFile != null){
       foto = File( pickedFile.path );
-      setState(() { });
+      //setState(() { });
     }
   }
   
